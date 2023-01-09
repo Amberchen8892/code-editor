@@ -1,30 +1,35 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Bundle from "../bundler/index";
 import CodeEditor from "./code-editor";
 import Preview from "./preview";
-//import Resizable from "./resizeable";
+import Resizable from "./resizable";
 const CodeCell = () => {
   const [code, setCode] = useState("");
   const [input, setInput] = useState("");
 
-  const onSubmit = async () => {
-    const output = await Bundle(input);
+  useEffect(() => {
+    const timer = setTimeout(async() => {
+      const output = await Bundle(input);
     setCode(output);
-  };
+
+    },1000)
+    return () => {
+      clearTimeout(timer)
+    }
+  },[input])
 
   return (
-    //<Resizable direction='vertical'>
-      <div>
+    <Resizable direction='vertical'>
+      <div style={{height:"100%", display:"flex", flexDirection:"row"}}>
+      <Resizable direction='horizontal'>
         <CodeEditor
           initialValue="const a=1;"
           onChange={(value) => setInput(value)}
         />
-        <div>
-          <button onClick={onSubmit}>Submit</button>
-        </div>
+        </Resizable>
         <Preview code={code} />
       </div>
-    //</Resizable>
+    </Resizable>
   );
 };
 
